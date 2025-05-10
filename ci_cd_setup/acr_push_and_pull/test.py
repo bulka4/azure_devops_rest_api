@@ -7,17 +7,17 @@ sys.path.append(classes_path)
 from dotenv import load_dotenv
 import json
 
-from class_connection_service import ConnectionService
+from class_connection_service import ServiceConnection
 
 # Load environment variables from the .env file
 load_dotenv()
 
-conn_serv = ConnectionService(
+sc = ServiceConnection(
     token = os.getenv('AZURE_DEVOPS_PAT')
     ,organization = os.getenv('DEVOPS_ORGANIZATION')
     ,project = os.getenv('DEVOPS_PROJECT')
 )
 
-conn_serv.get_services()
+sc.get_services()
 
-print(json.dumps(conn_serv.conn_services, indent = 1))
+print(json.dumps(sc.scices, indent = 1))

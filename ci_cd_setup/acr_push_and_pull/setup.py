@@ -36,7 +36,7 @@ from dotenv import load_dotenv
 import pandas as pd
 
 from class_library import Library
-from class_connection_service import ConnectionService
+from class_connection_service import ServiceConnection
 from class_yaml import Yaml
 from class_logs import Logs
 
@@ -58,27 +58,43 @@ tag = '$(Build.BuildId)' # The tag which will be assigned to the Docker image pu
 
 
 
-# === Adding variables to DevOps Library ===
-
 # Load environment variables from the .env file
 load_dotenv()
 
+token = os.getenv('AZURE_DEVOPS_PAT') # personal access token from DevOps
+
+# devops organization and project names can be taken from url: dev.azure.com/{organization}/{project}
+organization = os.getenv('DEVOPS_ORGANIZATION')
+project = os.getenv('DEVOPS_PROJECT')
+
+# Below variables are related to the Service Principal with scope for our ACR and acrpush role. It will be used 
+# for creating a Service Connection in DevOps to ACR and for pulling images from ACR.
+tenant_id = os.getenv('TENANT_ID') # ID of the tenant of the Service Principal 
+sp_id = os.getenv('SP_ID')  # Service Principal application ID
+sp_password = os.getenv('SP_PASSWORD') # Service Principal password
+
+subscription_id = os.getenv('SUB_ID') # Azure subscription ID
+
+
+
+# === Adding variables to DevOps Library ===
+
 # create a variable group in DevOps Library
 lib = Library(
-    token = os.getenv('AZURE_DEVOPS_PAT')
-    ,organization = os.getenv('DEVOPS_ORGANIZATION')
-    ,project = os.getenv('DEVOPS_PROJECT')
+    token = token
+    ,organization = organization
+    ,project = project
 )
 
 response = lib.create_variable_group(
     variable_group_name = devops_variable_group_name
     ,variables = {
         'SP_ID': {
-            "value": os.getenv('SP_ID'),
+            "value": sp_id,
             "isSecret": True
         },
         'SP_PASSWORD': {
-            "value": os.getenv('SP_PASSWORD'),
+            "value": sp_password,
             "isSecret": True
         }
     }
@@ -87,18 +103,18 @@ response = lib.create_variable_group(
 
 
 # === Creating a Service Connection in DevOps ===
-conn_serv = ConnectionService(
-    token = os.getenv('AZURE_DEVOPS_PAT')
-    ,organization = os.getenv('DEVOPS_ORGANIZATION')
-    ,project = os.getenv('DEVOPS_PROJECT')
+sc = ServiceConnection(
+    token = token
+    ,organization = organization
+    ,project = project
 )
 
-response = conn_serv.create_acr_service(
-    subscription_id = os.getenv('SUB_ID')
+response = sc.create_acr_service(
+    subscription_id = subscription_id
     ,subscription_name = subscription_name
-    ,tenant_id = os.getenv('TENANT_ID')
-    ,client_id = os.getenv('SP_ID')
-    ,client_password = os.getenv('SP_PASSWORD')
+    ,tenant_id = tenant_id
+    ,sp_id = sp_id
+    ,sp_password = sp_password
     ,acr_rg = acr_rg
     ,acr_name = acr_name
     ,service_name = acr_name

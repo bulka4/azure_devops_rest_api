@@ -9,7 +9,7 @@ classes_path = Path(Path(__file__).parent.parent.parent / 'classes')
 sys.path.append(classes_path.resolve().as_posix())
 
 from class_library import Library
-from class_connection_service import ConnectionService
+from class_connection_service import ServiceConnection
 from class_logs import Logs
 
 from dotenv import load_dotenv
@@ -21,15 +21,23 @@ devops_variable_group_name = 'ACR-SP-credentials' # Name of the Variable group w
 service_name = 'dataEngineeringApps' # Name of the Service connection which we will delete
 
 
+
 # Load environment variables from the .env file
 load_dotenv()
+
+token = os.getenv('AZURE_DEVOPS_PAT') # personal access token from DevOps
+
+# devops organization and project names can be taken from url: dev.azure.com/{organization}/{project}
+organization = os.getenv('DEVOPS_ORGANIZATION')
+project = os.getenv('DEVOPS_PROJECT')
+
 
 
 # === Deleting the Variable group ====
 lib = Library(
-    token = os.getenv('AZURE_DEVOPS_PAT')
-    ,organization = os.getenv('DEVOPS_ORGANIZATION')
-    ,project = os.getenv('DEVOPS_PROJECT')
+    token = token
+    ,organization = organization
+    ,project = project
 )
 
 lib.delete_variable_group(devops_variable_group_name)
@@ -37,13 +45,13 @@ lib.delete_variable_group(devops_variable_group_name)
 
 
 # === Deleting the Service connection ===
-conn_serv = ConnectionService(
-    token = os.getenv('AZURE_DEVOPS_PAT')
-    ,organization = os.getenv('DEVOPS_ORGANIZATION')
-    ,project = os.getenv('DEVOPS_PROJECT')
+sc = ServiceConnection(
+    token = token
+    ,organization = organization
+    ,project = project
 )
 
-conn_serv.delete_service(service_name)
+sc.delete_service(service_name)
 
 
 # === Save logs about deleted resources ===

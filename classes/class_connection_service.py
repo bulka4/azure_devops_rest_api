@@ -2,11 +2,11 @@ from class_devops import Devops
 import requests as rq
 import json
 
-class ConnectionService(Devops):
+class ServiceConnection(Devops):
     def __init__(
         self
-        ,token
-        ,organization
+        ,token # personall access token from the Azure DevOps website
+        ,organization # organization and project can be taken from the DevOps url: https://dev.azure.com/<organization>/<project>
         ,project
     ):
         super().__init__(
@@ -23,7 +23,7 @@ class ConnectionService(Devops):
         response = rq.get(url, headers=self.headers)
 
         if response.status_code == 200:
-            self.conn_services = response.json()
+            self.scices = response.json()
         else:
             print(f"Failed to get Service connections data. Status code: {response.status_code}")
             print(response.text)
@@ -33,10 +33,10 @@ class ConnectionService(Devops):
         self
         ,service_name
     ):
-        if not hasattr(self, 'conn_services'):
+        if not hasattr(self, 'scices'):
             self.get_services()
 
-        for service in self.conn_services['value']:
+        for service in self.scices['value']:
             if service['name'] == service_name:
                 return service['id']
         
@@ -46,8 +46,8 @@ class ConnectionService(Devops):
         ,subscription_id
         ,subscription_name
         ,tenant_id
-        ,client_id # service principal application ID
-        ,client_password # service principal password
+        ,sp_id # service principal application ID
+        ,sp_password # service principal password
         ,acr_rg # resource group with ACR
         ,acr_name # ACR name without the .azurecr.io
         ,service_name
@@ -59,9 +59,9 @@ class ConnectionService(Devops):
         #     "authorization": {
         #         "parameters": {
         #             "tenantid": tenant_id,
-        #             "serviceprincipalid": client_id,
+        #             "serviceprincipalid": sp_id,
         #             "authenticationType": "spnKey",
-        #             "serviceprincipalkey": client_password
+        #             "serviceprincipalkey": sp_password
         #         },
         #         "scheme": "ServicePrincipal"
         #     },
@@ -95,7 +95,7 @@ class ConnectionService(Devops):
                     "scope": acr_resource_id,
                     "tenantId": tenant_id,
                     "workloadIdentityFederationIssuerType": "EntraID",
-                    "serviceprincipalid": client_id
+                    "serviceprincipalid": sp_id
                 },
                 "scheme": "ServicePrincipal"
             },
