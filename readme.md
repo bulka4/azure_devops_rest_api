@@ -1,6 +1,13 @@
 # Intro
 This is a code for automatic management of resources in Azure DevOps and generating a proper YAML file which are needed to create a CI/CD pipeline for deploying applications. For example, those created resources and YAML file can be used for creating a CI/CD pipeline for deploying applications containerized using Docker onto an Azure Linux VM.
 
+# Setting up an Agent pool
+For building any CI/CD pipeline we need an Agent pool where we will be adding agents. Agents are installed on a computer and they performs actions defined in the CI/CD pipeline.
+
+In order to create an Agent pool we can use the ci_cd_setup > agent_pool_setup > setup.py script. In that script we need to specify a name of the Agent pool which we will create.
+
+Before running this script we need to create the .env file in the ci_cd_setup > agent_pool_setup folder and assign there DevOps access token to the 'AZURE_DEVOPS_PAT' variable just like it is shown in the .env-draft file.
+
 # Setting up resources for a CI/CD pipeline - ACR push and pull
 Here we are gonna explain how to use this code in order to set up resources in Azure DevOps and generate a YAML file needed to create a CI/CD pipeline which will be building a Docker image from code in repository, pushing it to the Azure Container Registry (ACR) and then pulling it onto Azure Linux VM and running it. 
 

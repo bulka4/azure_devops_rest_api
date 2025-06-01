@@ -1,4 +1,5 @@
-*.env
-**/testing
-**/venv
-**/__pycache__
+.env
+testing/
+venv/
+__pycache__/
+logs/
