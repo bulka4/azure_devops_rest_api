@@ -6,7 +6,7 @@ For building any CI/CD pipeline we need an Agent pool where we will be adding ag
 
 In order to create an Agent pool we can use the ci_cd_setup > agent_pool_setup > setup.py script. In that script we need to specify a name of the Agent pool which we will create.
 
-Before running this script we need to create the .env file in the ci_cd_setup > agent_pool_setup folder and assign there DevOps access token to the 'AZURE_DEVOPS_PAT' variable just like it is shown in the .env-draft file.
+Before running this script we need to create the .env file in the ci_cd_setup > agent_pool_setup folder and assign there DevOps access token to the 'AZURE_DEVOPS_PAT' variable. That file should look like the .env-draft file and it should be in the same location. It is described in that draft file what values to provide.
 
 # Setting up resources for a CI/CD pipeline - ACR push and pull
 Here we are gonna explain how to use this code in order to set up resources in Azure DevOps and generate a YAML file needed to create a CI/CD pipeline which will be building a Docker image from code in repository, pushing it to the Azure Container Registry (ACR) and then pulling it onto Azure Linux VM and running it. 
@@ -36,21 +36,7 @@ Before running the ci_cd_setup > acr_push_and_pull > setup.py script we need to 
 - **Agent pool** - name of this pool is used by the code to generate the proper YAML file. We don't need to have any Agents there in order to run this code. Pool can be created using the ci_cd_setup > agent_pool_setup > setup.py script as described in the previous section 'Setting up an Agent pool' in this documentation.
 - **Azure Container Registry and Service Principal** - we will be pushing our Docker images to ACR and pulling them from it. We need to have a Service Principal with the 'acrpush' role and scope for that ACR which will be used for authentication when pushing and pulling images. Both ACR and Service Principal can be created using the 'create_acr' module from the 'azure_terraform' repository.
 - **setup.py script configuration** - In the ci_cd_setup > acr_push_and_pull > setup.py script, at the beginning in the 'Script configuration' section we need to provide proper values for variables. They are described in the script.
-- **.env file configuration** - Before running this script we need to additionally create the .env file in the ci_cd_setup > acr_push_and_pull folder and add there a few environment variables:
-
-    -- devops organization and project names can be taken from url: dev.azure.com/{organization}/{project} --\
-    DEVOPS_ORGANIZATION = "your_organizaiton"\
-    DEVOPS_PROJECT = "your_project"\
-    -- personal access token to DevOps. It can be generated on the website. --\
-    AZURE_DEVOPS_PAT = "your_token"\
-    -- subscription ID --\
-    SUB_ID = "your_sub_id"\
-    -- Below are the credentials for Service Principal which has 'acrpush' role and scope for the ACR which we will be using for pushing and pulling images. --\
-    TENANT_ID = "your_tenant_id"\
-    CLIENT_ID = "your_client_id"\
-    CLIENT_PASSWORD = "your_client_password"
-
-    Those environment variables will be accessed in code using the dotenv module and os.getenv('env_variable_name') command.
+- **.env file configuration** - Before running this script we need to additionally create the .env file in the ci_cd_setup > acr_push_and_pull folder and specify there values for a few environment variables. This file should look like the .env-draft file in the same location. It is described there what values to provide. Those environment variables will be accessed in code using the dotenv module and os.getenv('env_variable_name') command.
 
 ## Cleaning up DevOps resources
 After we are finished and we want to delete DevOps resource which we created we can use the ci_cd_setup > acr_push_and_pull > cleanup.py script for that. We need to specify at the begining of that script, in the 'Script configuration' section, a few variables indicating which resources will be deleted.
